@@ -28,7 +28,7 @@ app.use(express.json());
 
 const allowedOrigins = [
   env.FRONTEND_URL,
-  "https://pinpoint-india-2.vercel.app",
+  "https://pinpoint-india-2-5o7e.vercel.app",
   "http://localhost:5173",
   "http://127.0.0.1:5173",
 ].filter(Boolean);
