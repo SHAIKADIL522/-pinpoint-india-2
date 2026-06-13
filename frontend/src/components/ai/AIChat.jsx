@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../../utils/api";
+import PremiumInput from "../ui/PremiumInput";
 
 export default function AIChat({ context }) {
   const [messages, setMessages] = useState([
@@ -45,10 +46,11 @@ export default function AIChat({ context }) {
   return (
     <div
       style={{
-        borderRadius: 14,
+        borderRadius: 16,
         overflow: "hidden",
-        background: "rgba(15,22,41,0.6)",
-        border: "1px solid rgba(99,102,241,0.2)",
+        background: "rgba(15,23,42,0.6)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        backdropFilter: "blur(20px)",
       }}
     >
       <div
@@ -58,15 +60,14 @@ export default function AIChat({ context }) {
           display: "flex",
           alignItems: "center",
           gap: 8,
-          background:
-            "linear-gradient(90deg, rgba(99,102,241,0.1), transparent)",
+          background: "linear-gradient(90deg, rgba(34,211,238,0.08), transparent)",
         }}
       >
-        <span style={{ fontSize: 16 }}>🤖</span>
-        <span style={{ fontSize: 13, fontWeight: 600, color: "#a5b4fc" }}>
+        <span style={{ fontSize: 16 }}>✨</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>
           AI Chat Assistant
         </span>
-        <span style={{ fontSize: 11, color: "#475569" }}>
+        <span style={{ fontSize: 11, color: "#64748B" }}>
           · Ask anything about {context?.district}
         </span>
       </div>
@@ -98,11 +99,11 @@ export default function AIChat({ context }) {
                     : "14px 14px 14px 4px",
                 background:
                   msg.role === "user"
-                    ? "rgba(59,130,246,0.2)"
-                    : "rgba(255,255,255,0.05)",
-                border: `1px solid ${msg.role === "user" ? "rgba(59,130,246,0.3)" : "rgba(255,255,255,0.08)"}`,
+                    ? "rgba(34,211,238,0.12)"
+                    : "rgba(255,255,255,0.04)",
+                border: `1px solid ${msg.role === "user" ? "rgba(34,211,238,0.25)" : "rgba(255,255,255,0.08)"}`,
                 fontSize: 13,
-                color: msg.role === "user" ? "#93c5fd" : "#e2e8f0",
+                color: msg.role === "user" ? "#67E8F9" : "#E2E8F0",
                 lineHeight: 1.6,
               }}
             >
@@ -128,7 +129,7 @@ export default function AIChat({ context }) {
                   width: 6,
                   height: 6,
                   borderRadius: "50%",
-                  background: "#6366f1",
+                  background: "#22D3EE",
                   animation: `bounce 1.2s ease ${i * 0.15}s infinite`,
                 }}
               />
@@ -148,24 +149,13 @@ export default function AIChat({ context }) {
           gap: 8,
         }}
       >
-        <input
+        <PremiumInput
+          size="sm"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && send()}
           placeholder="Ask anything…"
           disabled={loading}
-          style={{
-            flex: 1,
-            height: 38,
-            background: "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 10,
-            padding: "0 14px",
-            color: "#e2e8f0",
-            fontSize: 13,
-            fontFamily: "var(--font-body)",
-            outline: "none",
-          }}
         />
         <motion.button
           whileTap={{ scale: 0.9 }}
@@ -174,14 +164,16 @@ export default function AIChat({ context }) {
           style={{
             width: 38,
             height: 38,
+            flexShrink: 0,
             borderRadius: 10,
             cursor: "pointer",
             background: input.trim()
-              ? "rgba(99,102,241,0.3)"
+              ? "linear-gradient(135deg, #22D3EE 0%, #10B981 100%)"
               : "rgba(255,255,255,0.04)",
-            border: "1px solid rgba(99,102,241,0.3)",
-            color: "#a5b4fc",
+            border: "1px solid rgba(34,211,238,0.25)",
+            color: input.trim() ? "#020617" : "#67E8F9",
             fontSize: 16,
+            fontWeight: 800,
             transition: "all 0.2s",
           }}
         >

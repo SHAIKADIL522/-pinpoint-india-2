@@ -3,12 +3,16 @@
 //  Pure map canvas. Accepts pincode → auto fly-to + marker.
 //  No direct MapTiler calls here — all via hooks/services.
 //  Safe for Vite (no SSR issues, no dynamic import needed).
+//  Premium UI pass: glass container, MapSkeleton loading state,
+//  enterprise overlay badges. Map/hooks logic untouched.
 // ─────────────────────────────────────────────────────────────
 
 import { useId } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useMap }         from "../../hooks/useMap";
 import { usePincodeMap }  from "../../hooks/usePincodeMap";
 import MapControls        from "./MapControls";
+import MapSkeleton        from "../ui/MapSkeleton";
 
 /**
  * @param {Object}   props
@@ -52,65 +56,56 @@ export default function InteractiveMap({
         borderRadius: "16px",
         overflow:     "hidden",
         height,
-        background:   "var(--surface-2)",
-        border:       "1px solid var(--border-subtle)",
+        background:   "rgba(15,23,42,0.6)",
+        border:       "1px solid rgba(255,255,255,0.08)",
+        backdropFilter: "blur(8px)",
       }}
     >
       {/* Map canvas */}
       <div id={containerId} style={{ width: "100%", height: "100%" }} />
 
-      {/* Loading overlay */}
-      {!isLoaded && (
-        <div
-          style={{
-            position:       "absolute",
-            inset:          0,
-            display:        "flex",
-            flexDirection:  "column",
-            alignItems:     "center",
-            justifyContent: "center",
-            gap:            "12px",
-            background:     "var(--surface-2)",
-            zIndex:         10,
-          }}
-        >
-          <div className="map-spinner" />
-          <span
-            style={{
-              fontSize:    "12px",
-              color:       "var(--ink-muted)",
-              fontFamily:  "'JetBrains Mono', monospace",
-              letterSpacing: "0.05em",
-            }}
+      {/* Loading state */}
+      <AnimatePresence>
+        {!isLoaded && (
+          <motion.div
+            initial={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}
+            style={{ position: "absolute", inset: 0, zIndex: 10 }}
           >
-            Loading map…
-          </span>
-        </div>
-      )}
+            <MapSkeleton height="100%" />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Resolving pincode coordinates indicator */}
       {isLoaded && isResolving && (
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
           style={{
             position:    "absolute",
             top:         "12px",
             left:        "12px",
-            background:  "var(--surface-1)",
-            border:      "1px solid var(--border-subtle)",
+            background:  "rgba(15,23,42,0.8)",
+            border:      "1px solid rgba(255,255,255,0.08)",
             borderRadius: "8px",
             padding:     "6px 12px",
             fontSize:    "11px",
-            fontFamily:  "'JetBrains Mono', monospace",
-            color:       "var(--ink-secondary)",
+            fontFamily:  "var(--font-body)",
+            fontWeight:  600,
+            color:       "#94A3B8",
             zIndex:      20,
             display:     "flex",
             alignItems:  "center",
-            gap:         "6px",
+            gap:         "8px",
+            backdropFilter: "blur(12px)",
           }}
         >
-          <span style={{ color: "var(--accent-primary)" }}>●</span>
+          <motion.span
+            animate={{ scale: [1, 1.4, 1], opacity: [1, 0.4, 1] }}
+            transition={{ duration: 1.2, repeat: Infinity }}
+            style={{ color: "#22D3EE", fontSize: 10 }}
+          >●</motion.span>
           Locating {pincode}…
-        </div>
+        </motion.div>
       )}
 
       {/* Geo error badge */}
@@ -120,14 +115,16 @@ export default function InteractiveMap({
             position:    "absolute",
             top:         "12px",
             left:        "12px",
-            background:  "rgba(239,68,68,0.12)",
-            border:      "1px solid rgba(239,68,68,0.3)",
+            background:  "rgba(239,68,68,0.1)",
+            border:      "1px solid rgba(239,68,68,0.25)",
             borderRadius: "8px",
             padding:     "6px 12px",
             fontSize:    "11px",
+            fontWeight:  600,
             color:       "#f87171",
-            fontFamily:  "'JetBrains Mono', monospace",
+            fontFamily:  "var(--font-body)",
             zIndex:      20,
+            backdropFilter: "blur(12px)",
           }}
         >
           ⚠ Could not locate pincode on map
@@ -144,24 +141,27 @@ export default function InteractiveMap({
 
       {/* Coordinates badge (when geo resolved) */}
       {isLoaded && geoResult?.found && (
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
           style={{
             position:    "absolute",
             bottom:      "32px",
             left:        "12px",
-            background:  "rgba(0,0,0,0.65)",
-            backdropFilter: "blur(8px)",
-            borderRadius: "6px",
-            padding:     "4px 10px",
-            fontSize:    "10px",
-            fontFamily:  "'JetBrains Mono', monospace",
-            color:       "rgba(255,255,255,0.7)",
+            background:  "rgba(15,23,42,0.8)",
+            backdropFilter: "blur(12px)",
+            border:      "1px solid rgba(255,255,255,0.08)",
+            borderRadius: "8px",
+            padding:     "5px 12px",
+            fontSize:    "11px",
+            fontWeight:  600,
+            fontFamily:  "var(--font-body)",
+            color:       "#94A3B8",
             zIndex:      20,
             pointerEvents: "none",
           }}
         >
-          {geoResult.coordinates[1].toFixed(4)}°N · {geoResult.coordinates[0].toFixed(4)}°E
-        </div>
+          📍 {geoResult.coordinates[1].toFixed(4)}°N · {geoResult.coordinates[0].toFixed(4)}°E
+        </motion.div>
       )}
     </div>
   );
